@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package pb;
+
+message RawMessageV1 {
+    repeated RawMetricV1 RawMetrics = 1;
+}
+
+message EventV1 {
+    string Title = 1;
+    string Text = 2;
+    int64 DateHappened = 3;
+    string Hostname = 4;
+    string AggregationKey = 5;
+    string SourceTypeName = 6;
+    repeated string Tags = 7;
+    string SourceIP = 8;
+    enum EventPriority {
+        Normal = 0;
+        Low = 1;
+    };
+    EventPriority Priority = 9;
+    enum AlertType {
+        Info = 0;
+        Warning = 1;
+        Error = 2;
+        Success = 3;
+    }
+    AlertType Type = 10;
+}
+
+message RawMetricV1 {
+    string Name = 1;
+    uint64 Timestamp = 2;
+    repeated string Tags = 3;
+    string Hostname = 4;
+
+    oneof M {
+        RawCounterV1 counter = 12;
+        RawGaugeV1 gauge = 13;
+        RawSetV1 set = 14;
+        RawTimerV1 timer = 15;
+    }
+}
+
+message RawCounterV1 {
+    int64 Value = 1;
+}
+
+message RawGaugeV1 {
+    double Value = 1;
+}
+
+message RawSetV1 {
+    string Value = 1;
+}
+
+message RawTimerV1 {
+    double Value = 1;
+}

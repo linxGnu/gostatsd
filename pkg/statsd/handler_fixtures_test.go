@@ -3,8 +3,12 @@ package statsd
 import (
 	"context"
 	"sync"
+	"testing"
+	"time"
 
 	"github.com/atlassian/gostatsd"
+
+	"github.com/stretchr/testify/require"
 )
 
 type TagCapturingHandler struct {
@@ -66,4 +70,18 @@ func (ch *countingHandler) DispatchEvent(ctx context.Context, e *gostatsd.Event)
 }
 
 func (ch *countingHandler) WaitForEvents() {
+}
+
+func testContext(t *testing.T) (context.Context, func()) {
+	ctxTest, completeTest := context.WithTimeout(context.Background(), 1100*time.Millisecond)
+	go func() {
+		after := time.NewTimer(1 * time.Second)
+		select {
+		case <-ctxTest.Done():
+			after.Stop()
+		case <-after.C:
+			require.Fail(t, "test timed out")
+		}
+	}()
+	return ctxTest, completeTest
 }
